@@ -1,7 +1,14 @@
 import React from "react";
+import Header from "./component/Header";
+import Maps from "./component/Maps";
 
-function App() {
-  return <div className="App"></div>;
-}
+const App = () => {
+  return (
+    <div>
+      <Header></Header>
+      <Maps></Maps>
+    </div>
+  );
+};
 
 export default App;
