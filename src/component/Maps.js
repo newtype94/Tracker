@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { Container, Col, Row, Form, FormControlProps } from "react-bootstrap";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { Container, Col, Row, Form } from "react-bootstrap";
 
 import { RenderAfterNavermapsLoaded } from "react-naver-maps";
 import NaverMaps from "./NaverMaps";
 
 const Maps = () => {
   const [gender, setGender] = useState("all"); // male, female, all
+  const [age, setAge] = useState("all"); // 10,20,30,40,50,60, all
   const [dateTime, setDateTime] = useState(new Date());
 
   useEffect(() => {}, [dateTime]);
