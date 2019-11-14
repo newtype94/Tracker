@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NaverMap, Polyline } from "react-naver-maps";
 
-const NaverMaps = locates => {
+const NaverMaps = ({ locates = [] }) => {
   const naver = window.naver;
-  const toPath = [];
-  locates.forEach((value, index, array) => {
-    toPath.push(new naver.maps.LatLng(value.lat, value.lng));
-  });
+  const [paths, setPaths] = useState([]); // new naver.maps.LatLng(37.365620929135716, 127.1036195755005)
+
+  useEffect(() => {
+    setPaths(
+      locates.reduce((acc, current) => {
+        acc.push(new naver.maps.LatLng(current.lat, current.lng));
+        return acc;
+      }, [])
+    );
+    console.log(paths);
+  }, [locates]);
 
   return (
     <NaverMap
@@ -15,18 +22,11 @@ const NaverMaps = locates => {
         width: "100%",
         height: "700px"
       }}
-      defaultCenter={{ lat: 37.3595704, lng: 127.105399 }}
+      defaultCenter={{ lat: 37.586159, lng: 127.028882 }}
       defaultZoom={10}
     >
       <Polyline
-        path={[
-          new naver.maps.LatLng(37.365620929135716, 127.1036195755005),
-          new naver.maps.LatLng(37.365620929135716, 127.11353302001953),
-          new naver.maps.LatLng(37.3606921307849, 127.10452079772949),
-          new naver.maps.LatLng(37.36821310838941, 127.10814714431763),
-          new naver.maps.LatLng(37.360760351656545, 127.11299657821654),
-          new naver.maps.LatLng(37.365620929135716, 127.1036195755005)
-        ]}
+        path={paths}
         strokeColor={"red"}
         strokeOpacity={0.5}
         strokeWeight={5}

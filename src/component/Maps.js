@@ -10,7 +10,7 @@ import samples from "../data/20191111.js";
 const Maps = () => {
   const [gender, setGender] = useState("all"); // male, female, all
   const [age, setAge] = useState("all"); // 10,20,30,40,50,60, all
-  const [loca, setLoca] = useState([]); //{latitude : number, longtitude : number}
+  const [loca, setLoca] = useState([]); //{lat : number, lng : number}
   const [dateTime, setDateTime] = useState(new Date());
 
   const url = "https://opensource.adobe.com/Spry/data/json/array-02.js";
@@ -19,7 +19,7 @@ const Maps = () => {
 
     setLoca(
       samples.reduce((acc, current) => {
-        acc.push({ lat: current.lat, lon: current.lon });
+        acc.push({ lat: current.lat, lng: current.lng });
         return acc;
       }, [])
     );
