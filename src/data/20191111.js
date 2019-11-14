@@ -15,7 +15,7 @@ const data = [
   },
   {
     age: 20,
-    gender: "male",
+    gender: "female",
     lat: 37.586527,
     lon: 127.029145,
     time: "2019-11-11T04:52:30.042Z"

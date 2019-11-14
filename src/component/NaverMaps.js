@@ -1,8 +1,13 @@
 import React from "react";
 import { NaverMap, Polyline } from "react-naver-maps";
 
-const NaverMaps = () => {
+const NaverMaps = locates => {
   const naver = window.naver;
+  const toPath = [];
+  locates.forEach((value, index, array) => {
+    toPath.push(new naver.maps.LatLng(value.lat, value.lng));
+  });
+
   return (
     <NaverMap
       mapDivId={"maps-getting-started-uncontrolled"} // default: react-naver-map
