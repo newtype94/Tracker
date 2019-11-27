@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { NaverMap, Polyline } from "react-naver-maps";
 
-const NaverMaps = ({ locates = [] }) => {
+const NaverMaps = ({
+  locates = [],
+  center = { lat: 37.586159, lng: 127.028882 }
+}) => {
   const naver = window.naver;
   const [paths, setPaths] = useState([]); // new naver.maps.LatLng(37.365620929135716, 127.1036195755005)
 
@@ -22,7 +25,7 @@ const NaverMaps = ({ locates = [] }) => {
         width: "100%",
         height: "700px"
       }}
-      defaultCenter={{ lat: 37.586159, lng: 127.028882 }}
+      defaultCenter={center}
       defaultZoom={10}
     >
       <Polyline
