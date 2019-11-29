@@ -28,12 +28,23 @@ const Maps = () => {
     "https://naveropenapi.apigw.ntruss.com/map-place/v1/search?query=" +
     searchWord +
     "&coordinate=" +
-    searches.y +
+    center.lng +
     "," +
-    searches.x;
+    center.lat;
+  const mine =
+    "https://naveropenapi.apigw.ntruss.com/map-place/v1/search?query=%EA%B7%B8%EB%A6%B0%ED%8C%A9%ED%86%A0%EB%A6%AC&coordinate=127.1054328,37.3595963";
 
   const searchLoca = async () => {
-    const datas = await axios.get(searchUrl);
+    const datas = await fetch({
+      method: "get",
+      url: mine,
+      headers: {
+        "X-NCP-APIGW-API-KEY-ID": "i3enee60g7",
+        "X-NCP-APIGW-API-KEY": "JTVfs0VlgOvgGhIfQcRSDFOnh4YBovQ6R4b8x7ki"
+      },
+      responseType: "stream"
+    });
+    console.log(datas);
 
     setSearches(
       samples.reduce((acc, current) => {
