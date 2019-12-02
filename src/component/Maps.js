@@ -43,12 +43,20 @@ const Maps = () => {
     "," +
     center.lat;
 
+  let tempMonth = dateTime.getMonth() + 1;
+  let tempDate = dateTime.getDate();
+  if (tempMonth < 10) tempMonth = "0" + tempMonth;
+  if (tempDate < 10) tempDate = "0" + tempDate;
+
   const apiUrl =
     "http://mr-y.asuscomm.com:3000/company?centerX=" +
     center.lng +
     "&centerY=" +
     center.lat +
-    "&radius=100&date=20191129";
+    "&radius=100&date=" +
+    dateTime.getFullYear().toString() +
+    tempMonth +
+    tempDate;
 
   const searchLoca = async () => {
     const datas = await axios({
@@ -63,6 +71,7 @@ const Maps = () => {
   };
 
   const fetchDatas = async () => {
+    console.log(apiUrl);
     const getDatas = await axios.get(apiUrl);
     console.log("New Data arrvied.. \n", getDatas.data);
     setDatas(getDatas.data);
@@ -97,7 +106,7 @@ const Maps = () => {
   useEffect(() => {
     console.log("New data requested..");
     fetchDatas();
-  }, [dateTime, center]);
+  }, [dateTime, center, dateTime]);
 
   useEffect(() => {
     console.log("Data filtering..");
@@ -158,7 +167,7 @@ const Maps = () => {
           })}
         </Row>
         <Row>
-          <Col xs={12}>
+          <Col>
             <Form.Group>
               <Row>
                 <Col>
@@ -211,24 +220,29 @@ const Maps = () => {
         <NaverMaps datas={filteredDatas} center={center}></NaverMaps>
       </RenderAfterNavermapsLoaded>
 
-      <ButtonGroup id="scrollTool">
-        <Button
-          variant="dark"
-          onClick={e => {
-            scroll.scrollToTop();
-          }}
-        >
-          <FaChevronUp></FaChevronUp>
-        </Button>
-        <Button
-          variant="danger"
-          onClick={e => {
-            scroll.scrollToBottom();
-          }}
-        >
-          <FaChevronDown></FaChevronDown>
-        </Button>
-      </ButtonGroup>
+      <div id="scrollTool">
+        <div className="text-danger">
+          총 {filteredDatas.length}명<br></br>
+        </div>
+        <ButtonGroup>
+          <Button
+            variant="dark"
+            onClick={e => {
+              scroll.scrollToTop();
+            }}
+          >
+            <FaChevronUp></FaChevronUp>
+          </Button>
+          <Button
+            variant="danger"
+            onClick={e => {
+              scroll.scrollToBottom();
+            }}
+          >
+            <FaChevronDown></FaChevronDown>
+          </Button>
+        </ButtonGroup>
+      </div>
     </div>
   );
 };
