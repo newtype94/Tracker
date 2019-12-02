@@ -1,11 +1,10 @@
 import React from "react";
-import Header from "./component/Header";
 import Maps from "./component/Maps";
+import "./css/App.css";
 
 const App = () => {
   return (
-    <div>
-      <Header></Header>
+    <div class="purple">
       <Maps></Maps>
     </div>
   );

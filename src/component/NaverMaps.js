@@ -2,39 +2,50 @@ import React, { useEffect, useState } from "react";
 import { NaverMap, Polyline } from "react-naver-maps";
 
 const NaverMaps = ({
-  locates = [],
+  datas = [],
   center = { lat: 37.586159, lng: 127.028882 }
 }) => {
   const naver = window.naver;
-  const [paths, setPaths] = useState([]); // new naver.maps.LatLng(37.365620929135716, 127.1036195755005)
+  // [ [A's naverSites], [B's naverSites], [C's naverSites] ]
+  const [paths, setPaths] = useState([]);
 
   useEffect(() => {
-    setPaths(
-      locates.reduce((acc, current) => {
-        acc.push(new naver.maps.LatLng(current.lat, current.lng));
-        return acc;
-      }, [])
-    );
-    console.log(paths);
-  }, [locates]);
+    let a = [];
+    datas.forEach(data => {
+      a.push(
+        data.locations.reduce((acc, current) => {
+          acc.push(new naver.maps.LatLng(current.y, current.x));
+          return acc;
+        }, [])
+      );
+    });
+    setPaths(a);
+    console.log(a);
+  }, [datas]);
 
   return (
-    <NaverMap
-      mapDivId={"maps-getting-started-uncontrolled"} // default: react-naver-map
-      style={{
-        width: "100%",
-        height: "700px"
-      }}
-      defaultCenter={center}
-      defaultZoom={10}
-    >
-      <Polyline
-        path={paths}
-        strokeColor={"red"}
-        strokeOpacity={0.5}
-        strokeWeight={5}
-      />
-    </NaverMap>
+    <div>
+      <NaverMap
+        mapDivId={"maps-getting-started-uncontrolled"} // default: react-naver-map
+        style={{
+          width: "100%",
+          height: "100vh"
+        }}
+        center={center}
+        defaultZoom={11}
+      >
+        {paths.map(path => {
+          return (
+            <Polyline
+              path={path}
+              strokeColor={"purple"}
+              strokeOpacity={0.5}
+              strokeWeight={1}
+            />
+          );
+        })}
+      </NaverMap>
+    </div>
   );
 };
 

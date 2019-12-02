@@ -7,118 +7,181 @@ import {
   Row,
   Form,
   FormControl,
-  Button
+  Button,
+  ButtonGroup,
+  Badge
 } from "react-bootstrap";
 import { RenderAfterNavermapsLoaded } from "react-naver-maps";
 import NaverMaps from "./NaverMaps";
 import axios from "axios";
-import samples from "../data/20191111.js";
+import { animateScroll as scroll } from "react-scroll";
+import "../css/Map.css";
+import {
+  FaSistrix,
+  FaEraser,
+  FaChevronUp,
+  FaChevronDown
+} from "react-icons/fa";
 
 const Maps = () => {
-  const [gender, setGender] = useState("all"); // male, female, all
-  const [age, setAge] = useState("all"); // 10,20,30,40,50,60, all
-  const [locas, setLocas] = useState([]); //{lat : number, lng : number}
-  const [center, setCenter] = useState({ lat: 37.586159, lng: 127.028882 }); //{lat : number, lng : number}
   const [searchWord, setSearchWord] = useState("");
-  const [searches, setSearches] = useState([]); //{"name": string, "jibun_address": string, "x": number, "y": number}
+  const [searchResults, setSearchResults] = useState([]); //{"name": string, "jibun_address": string, "x": number, "y": number}
+
+  const [gender, setGender] = useState("all"); // M, F, all
+  const [age, setAge] = useState("all"); // 10,20,30,40,50,60, all
   const [dateTime, setDateTime] = useState(new Date());
 
-  const url = "https://opensource.adobe.com/Spry/data/json/array-02.js";
+  const [datas, setDatas] = useState([]); //{id : string, locations : [], }
+  const [filteredDatas, setFilteredDatas] = useState([]); //{id : string, locations : [], }
+  const [center, setCenter] = useState({ lat: 37.586159, lng: 127.028882 }); //{lat : number, lng : number}
+
   const searchUrl =
-    "https://naveropenapi.apigw.ntruss.com/map-place/v1/search?query=" +
+    "/map-place/v1/search?query=" +
     searchWord +
     "&coordinate=" +
     center.lng +
     "," +
     center.lat;
-  const mine =
-    "https://naveropenapi.apigw.ntruss.com/map-place/v1/search?query=%EA%B7%B8%EB%A6%B0%ED%8C%A9%ED%86%A0%EB%A6%AC&coordinate=127.1054328,37.3595963";
+
+  const apiUrl =
+    "http://mr-y.asuscomm.com:3000/company?centerX=" +
+    center.lng +
+    "&centerY=" +
+    center.lat +
+    "&radius=100&date=20191129";
 
   const searchLoca = async () => {
-    const datas = await fetch({
-      method: "get",
-      url: mine,
+    const datas = await axios({
+      url: searchUrl,
+      method: "GET",
       headers: {
         "X-NCP-APIGW-API-KEY-ID": "i3enee60g7",
         "X-NCP-APIGW-API-KEY": "JTVfs0VlgOvgGhIfQcRSDFOnh4YBovQ6R4b8x7ki"
-      },
-      responseType: "stream"
+      }
     });
-    console.log(datas);
-
-    setSearches(
-      samples.reduce((acc, current) => {
-        acc.push({ lat: current.lat, lng: current.lng });
-        return acc;
-      }, [])
-    );
-    console.log(locas);
+    setSearchResults(datas.data.places);
   };
 
-  const getDatas = async () => {
-    const datas = await axios.get(url);
-
-    setLocas(
-      samples.reduce((acc, current) => {
-        acc.push({ lat: current.lat, lng: current.lng });
-        return acc;
-      }, [])
-    );
-    console.log(locas);
+  const fetchDatas = async () => {
+    const getDatas = await axios.get(apiUrl);
+    console.log("New Data arrvied.. \n", getDatas.data);
+    setDatas(getDatas.data);
+    setFilteredDatas(getDatas.data);
   };
+
+  const filtering = () => {
+    if (gender === "all") {
+      if (age === "all") setFilteredDatas(datas);
+      else if (age === "60")
+        setFilteredDatas(datas.filter(data => data.age >= 60));
+      else setFilteredDatas(datas.filter(data => data.age == age));
+    } else {
+      if (age === "all")
+        setFilteredDatas(datas.filter(data => data.gender === gender));
+      else if (age === "60")
+        setFilteredDatas(
+          datas
+            .filter(data => data.gender === gender)
+            .filter(data => data.age >= 60)
+        );
+      else
+        setFilteredDatas(
+          datas
+            .filter(data => data.gender === gender)
+            .filter(data => data.age === age)
+        );
+    }
+  };
+
+  //날짜, 중심좌표가 바뀌었을때 API호출
+  useEffect(() => {
+    console.log("New data requested..");
+    fetchDatas();
+  }, [dateTime, center]);
 
   useEffect(() => {
-    getDatas();
-  }, [dateTime]);
-
-  const dateChanged = date => {
-    setDateTime(date);
-  };
-
-  const genderChanged = event => {
-    setGender(event.target.value);
-  };
-
-  const ageChanged = event => {
-    setAge(event.target.value);
-  };
+    console.log("Data filtering..");
+    filtering();
+  }, [gender, age]);
 
   return (
     <div>
-      <Container>
-        <Row className="mt-3">
-          <Col xs={12} md={6}>
-            <Form inline>
-              <FormControl
-                type="text"
-                placeholder="Search"
-                className="mr-sm-2"
-                onChange={event => {
-                  setSearchWord(event.target.value);
-                }}
-              />
-              <Button variant="outline-info" onClick={searchLoca}>
-                Search
-              </Button>
-            </Form>
-          </Col>
-          <Col xs={12} md={6}></Col>
-        </Row>
-        <Row className="mt-3">
-          <Col xs={12}>
-            <Form.Group controlId="Instrument">
+      <Container id="header">
+        <Row>
+          <Col xs={12} md={6} className="mt-3">
+            <Form.Group>
               <Row>
                 <Col>
-                  <Form.Control as="select" onChange={genderChanged}>
+                  <FormControl
+                    type="text"
+                    placeholder="Search"
+                    className="mr-sm-2"
+                    onChange={event => {
+                      setSearchWord(event.target.value);
+                    }}
+                  />
+                </Col>
+                <Col>
+                  <Button variant="outline-info" onClick={searchLoca}>
+                    <FaSistrix></FaSistrix>
+                  </Button>
+                  <span> </span>
+                  <Button
+                    variant="outline-danger"
+                    onClick={e => {
+                      setSearchResults([]);
+                    }}
+                  >
+                    <FaEraser></FaEraser>
+                  </Button>
+                </Col>
+              </Row>
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          {searchResults.map(item => {
+            return (
+              <Col xs={12} md={6} className="text-white mb-1">
+                <Button
+                  variant="info"
+                  onClick={e => {
+                    setCenter({ lat: item.y, lng: item.x });
+                  }}
+                >
+                  {item.name}
+                  <span> </span>
+                  <Badge variant="warning">{item.jibun_address}</Badge>
+                </Button>
+              </Col>
+            );
+          })}
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <Form.Group>
+              <Row>
+                <Col>
+                  <Form.Control
+                    as="select"
+                    onChange={event => {
+                      setGender(event.target.value);
+                    }}
+                  >
                     <option value="all" selected>
                       나이 - 모두
                     </option>
-                    <option value="male">남자</option>
-                    <option value="female">여자</option>
+                    <option value="M">남자</option>
+                    <option value="F">여자</option>
                   </Form.Control>
                 </Col>
                 <Col>
-                  <Form.Control as="select" onChange={ageChanged}>
+                  <Form.Control
+                    as="select"
+                    onChange={event => {
+                      setAge(event.target.value);
+                    }}
+                  >
                     <option value="all" selected>
                       연령대 - 모두
                     </option>
@@ -133,7 +196,9 @@ const Maps = () => {
                 <Col>
                   <DatePicker
                     selected={dateTime}
-                    onChange={dateChanged}
+                    onChange={date => {
+                      setDateTime(date);
+                    }}
                     dateFormat="yyyy-MM-dd"
                   />
                 </Col>
@@ -143,8 +208,27 @@ const Maps = () => {
         </Row>
       </Container>
       <RenderAfterNavermapsLoaded ncpClientId={"i3enee60g7"}>
-        <NaverMaps locates={locas} center={center}></NaverMaps>
+        <NaverMaps datas={filteredDatas} center={center}></NaverMaps>
       </RenderAfterNavermapsLoaded>
+
+      <ButtonGroup id="scrollTool">
+        <Button
+          variant="dark"
+          onClick={e => {
+            scroll.scrollToTop();
+          }}
+        >
+          <FaChevronUp></FaChevronUp>
+        </Button>
+        <Button
+          variant="danger"
+          onClick={e => {
+            scroll.scrollToBottom();
+          }}
+        >
+          <FaChevronDown></FaChevronDown>
+        </Button>
+      </ButtonGroup>
     </div>
   );
 };
